@@ -35,18 +35,18 @@ const (
 // Since the names of the different formatting styles are not standardized, only
 // a few of the common ones have consts defined.  The complete list is below:
 //
-//	- twowords
-//	- TWOWORDS
-//	- twoWords
-//	- TwoWords
-//	- two_words
-//	- TWO_WORDS
-//	- two_Words
-//	- Two_Words
-//	- two-words
-//	- TWO-WORDS
-//	- Two-Words
-//	- two-Words
+//   - twowords
+//   - TWOWORDS
+//   - twoWords
+//   - TwoWords
+//   - two_words
+//   - TWO_WORDS
+//   - two_Words
+//   - Two_Words
+//   - two-words
+//   - TWO-WORDS
+//   - Two-Words
+//   - two-Words
 //
 // adjustments are in the form of incoming name is the key and the structure
 // field name is the value.
