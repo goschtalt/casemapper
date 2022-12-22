@@ -215,7 +215,7 @@ func TestIntegration(t *testing.T) {
 	assert.Equal("", foo3.HTTPHeader)
 }
 
-func TestDebugIntegration(t *testing.T) {
+func TestDebugIntegration1(t *testing.T) {
 	assert := assert.New(t)
 	require := require.New(t)
 
@@ -248,8 +248,29 @@ func TestDebugIntegration(t *testing.T) {
 
 	assert.Equal("(key) 'HTTP-Header' == 'HTTPHeader' (struct field)\n", w.String())
 	assert.Equal("http header", fooVar.HTTPHeader)
-	w.Reset()
+}
 
+func TestDebugIntegration2(t *testing.T) {
+	assert := assert.New(t)
+	require := require.New(t)
+
+	type foo struct {
+		HTTPHeader string `train:"HTTP-Header"`
+	}
+
+	gs, err := goschtalt.New(
+		goschtalt.AutoCompile(),
+		goschtalt.AddValue("record", goschtalt.Root,
+			&foo{
+				HTTPHeader: "http header",
+			},
+			goschtalt.TagName("train"),
+		),
+	)
+	require.NoError(err)
+	require.NotNil(gs)
+
+	var w bytes.Buffer
 	type bar struct {
 		Name string
 	}
@@ -261,4 +282,35 @@ func TestDebugIntegration(t *testing.T) {
 
 	assert.Equal("(key) 'HTTP-Header' != 'Name' (struct field)\n", w.String())
 	assert.Equal("", barVar.Name)
+}
+
+func TestDebugIntegration3(t *testing.T) {
+	assert := assert.New(t)
+	require := require.New(t)
+
+	type foo struct {
+		HTTPHeader string `train:"HTTP-Header"`
+	}
+
+	gs, err := goschtalt.New(
+		goschtalt.AutoCompile(),
+		goschtalt.AddValue("record", goschtalt.Root,
+			&foo{
+				HTTPHeader: "http header",
+			},
+			goschtalt.TagName("train"),
+		),
+	)
+	require.NoError(err)
+	require.NotNil(gs)
+
+	var w bytes.Buffer
+	type bar struct {
+		Name string
+	}
+
+	_, err = goschtalt.Unmarshal[bar](gs, goschtalt.Root, DebugFrom(&w, "invalid_mode"))
+
+	assert.Error(err)
+	assert.Equal("", w.String())
 }
