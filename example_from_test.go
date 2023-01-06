@@ -38,9 +38,10 @@ func ExampleFrom() {
 	}
 
 	cfg, err := goschtalt.Unmarshal[Config](gs, "",
-		casemapper.From("Two-Words",
+		casemapper.ConfigStoredAs("Two-Words"),
+		goschtalt.Keymap(
 			map[string]string{
-				"HTTP-Header": "HTTPHeader",
+				"HTTPHeader": "HTTP-Header",
 			},
 		),
 	)

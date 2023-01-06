@@ -2,8 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // casemapper bundles up the tedious work of tagging structures with a specific
-// naming convention case for configuration.  To overcome the always present
-// lists of exceptional cases, it provides a simple way to declare those too.
+// naming convention case for configuration.
 //
 // # Extended Character Sets
 //
@@ -13,7 +12,6 @@ package casemapper
 
 import (
 	"fmt"
-	"io"
 	"sort"
 	"strings"
 	"unicode"
@@ -47,14 +45,12 @@ var fmtToFn = map[string]func(string) string{
 	"Two_Words": casbab.CamelSnake,
 	"two-words": casbab.Kebab,
 	"TWO-WORDS": casbab.ScreamingKebab,
-	"Two-Words": casbab.CamelKebab,
 	"two-Words": lowerCamelKebab,
+	"Two-Words": casbab.CamelKebab,
 }
 
-// From provides a strict mapper that expects configuration values in the format
-// specified and maps them to structures.  An optional adjustments map provides
-// a simple way to specify any mappings that aren't automatically determined
-// correctly.
+// ConfigStoredAs provides a strict field/key mapper that converts the config
+// values from the specified nomenclature into the go structure name.
 //
 // Since the names of the different formatting styles are not standardized, only
 // a few of the common ones have consts defined.  The complete list is below:
@@ -72,20 +68,14 @@ var fmtToFn = map[string]func(string) string{
 //   - Two-Words
 //   - two-Words
 //
-// adjustments are in the form of incoming name is the key and the structure
-// field name is the value.
-func From(format string, adjustments ...map[string]string) goschtalt.UnmarshalValueOption {
-	return DebugFrom(nil, format, adjustments...)
-}
-
-// DebugFrom is identical to From() except that it accepts a io.Writer to output
-// the comparisons to for debugging purposes.
-func DebugFrom(w io.Writer, format string, adjustments ...map[string]string) goschtalt.UnmarshalValueOption {
-	adjustments = append(adjustments, map[string]string{})
-
-	fn := from(format, w, adjustments[0])
-	if fn != nil {
-		return goschtalt.MatchName(fn)
+// This option provides a goschtalt.KeymapFn based option that will convert
+// every input string, effectively ending the chain 100% of the time.
+// Generally, this option should be specified prior to any goschtalt.Keymap
+// options that handle customization.
+func ConfigStoredAs(format string) goschtalt.UnmarshalValueOption {
+	toCase, found := fmtToFn[format]
+	if found {
+		return goschtalt.KeymapFn(toCase)
 	}
 
 	keys := make([]string, 0, len(fmtToFn))
@@ -96,48 +86,12 @@ func DebugFrom(w io.Writer, format string, adjustments ...map[string]string) gos
 	sort.Strings(keys)
 
 	return goschtalt.WithError(
-		fmt.Errorf("%w, '%s' unknown format by casemapper.From().  Known formats: %s",
+		fmt.Errorf("%w, '%s' unknown format by casemapper.ConfigStoredAs().  Known formats: %s",
 			goschtalt.ErrInvalidInput,
 			format,
 			strings.Join(keys, ", "),
 		),
 	)
-}
-
-func from(format string, w io.Writer, adjustments map[string]string) func(string, string) bool {
-	toCase, found := fmtToFn[format]
-	if !found {
-		return nil
-	}
-
-	cmp := func(key, field string) bool {
-		if v, match := adjustments[key]; match {
-			if v == field {
-				return true
-			}
-			if v == "-" {
-				return false
-			}
-		}
-
-		// Convert the field to match the desired type since casbab will auto
-		// convert from any input into the desired output.
-		return key == toCase(field)
-	}
-
-	if w == nil {
-		return cmp
-	}
-
-	return func(key, field string) bool {
-		rv := cmp(key, field)
-		equality := "!="
-		if rv {
-			equality = "=="
-		}
-		fmt.Fprintf(w, "(key) '%s' %s '%s' (struct field)\n", key, equality, field)
-		return rv
-	}
 }
 
 func allLower(s string) string {
