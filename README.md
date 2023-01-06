@@ -10,17 +10,18 @@
 An optional set of [naming conventions](https://en.wikipedia.org/wiki/Naming_convention_(programming)) mapping options for goschtalt.
 
 Fairly often we want to use structures for configuration that we can't easily alter.
-Fortunately [mitchellh/mapstructure](https://github.com/mitchellh/mapstructure) provides an
-easy way to inject arbitrary remappers/handlers, however that code is fairly boiler
-plate and clunky to repeat.  Hence the value of this library.  With the
-[janos/casbab](https://github.com/janos/casbab) and a bit of glue code, it's now
-easy to automatically convert from config files that may be `snake_case` into go
-structures that follow the general conventions.
+Fortunately goschtalt provides an easy way to inject arbitrary mappers, however
+that code is fairly boiler plate and clunky to repeat.  Hence the value of this
+library.  With the [janos/casbab](https://github.com/janos/casbab) and a bit of
+glue code, it's now easy to automatically convert from config files that may be
+`snake_case` into go structures that follow the general conventions.
 
-When unmarshaling simply slide in this option:
+To set configuration from go structs (AddValue()) or read configuration values
+from a configuration that is `snake_case` just use the option in place of
+`goschtalt.KeymapFn()`.
 
 ```go
-	casemapper.From("two_words")
+	casemapper.ConfigStoredAs("two_words")
 ```
 
 With more complex structures there will likely be exceptions needed.  For example,
@@ -29,7 +30,8 @@ value as `Http-Header` no problem; there is an optional `map[string]string` para
 that maps the **configuration field** to the **structure field**.
 
 ```go
-	casemapper.From("Two_Words",
+	casemapper.ConfigStoredAs("Two_Words"),
+    goschtalt.Keymap(
 		map[string]string{
 			"Configuration-Field": "StructureField",
 			"HTTP-Header": "HTTPHeader",
@@ -37,20 +39,8 @@ that maps the **configuration field** to the **structure field**.
     )
 ```
 
-With the ability to overwrite, you can easily remap whatever you want.  You can
-even prevent fields from being populated just as if they included the `mapstructure:"-"`
-tag.
-
-```go
-	casemapper.From("Two_Words",
-		map[string]string{
-			"Configuration-Field": "-",
-		},
-    )
-```
-
 References
 ----------
-- https://github.com/mitchellh/mapstructure
-- https://github.com/janos/casbab
+- https://en.wikipedia.org/wiki/Naming_convention_(programming)
 - https://github.com/goschtalt/goschtalt
+- https://github.com/janos/casbab
