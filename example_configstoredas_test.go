@@ -10,7 +10,7 @@ import (
 	"github.com/goschtalt/goschtalt"
 )
 
-func ExampleFrom() {
+func ExampleConfigStoredAs() {
 	gs, err := goschtalt.New(
 		goschtalt.AutoCompile(),
 
