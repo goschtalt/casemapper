@@ -125,15 +125,8 @@ func TestUnknown(t *testing.T) {
 	assert := assert.New(t)
 	require := require.New(t)
 
-	gs, err := goschtalt.New(goschtalt.AutoCompile())
-	require.NotNil(gs)
-	require.NoError(err)
-
-	type Config struct {
-		Foobar string
-	}
-
-	_, err = goschtalt.Unmarshal[Config](gs, goschtalt.Root, ConfigStoredAs("Invalid"))
-	assert.NotNil(err)
+	gs, err := goschtalt.New(goschtalt.AutoCompile(), ConfigStoredAs("Invalid"))
+	require.Nil(gs)
+	require.Error(err)
 	assert.True(strings.Contains(err.Error(), expected))
 }
