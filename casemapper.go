@@ -72,10 +72,16 @@ var fmtToFn = map[string]func(string) string{
 // every input string, effectively ending the chain 100% of the time.
 // Generally, this option should be specified prior to any goschtalt.Keymap
 // options that handle customization.
-func ConfigStoredAs(format string) goschtalt.UnmarshalValueOption {
-	toCase, found := fmtToFn[format]
-	if found {
-		return goschtalt.KeymapFn(toCase)
+func ConfigStoredAs(format string) goschtalt.Option {
+	if toCase, found := fmtToFn[format]; found {
+		return goschtalt.Options(
+			goschtalt.DefaultUnmarshalOptions(
+				goschtalt.KeymapFn(toCase),
+			),
+			goschtalt.DefaultValueOptions(
+				goschtalt.KeymapFn(toCase),
+			),
+		)
 	}
 
 	keys := make([]string, 0, len(fmtToFn))
