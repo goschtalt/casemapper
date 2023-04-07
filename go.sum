@@ -7,6 +7,8 @@ github.com/goschtalt/goschtalt v0.11.0 h1:+eFTad9U4RUXEb0/YHFXju8NL14NacN8NgnGwR
 github.com/goschtalt/goschtalt v0.11.0/go.mod h1:mfE8q3rKJDM2HTFFbPP1m5m5Nn15A5Hk33JTZxPR2RM=
 github.com/goschtalt/goschtalt v0.12.0 h1:IzkdRgmYK3hgsGncvRaxbuMyQJt6C5DKLmyM2lrUtjw=
 github.com/goschtalt/goschtalt v0.12.0/go.mod h1:mfE8q3rKJDM2HTFFbPP1m5m5Nn15A5Hk33JTZxPR2RM=
+github.com/goschtalt/goschtalt v0.13.0 h1:YjUrGCpSj4Vma+OxcpK+n3gkHU3tQVLgIWzZEjaxhwA=
+github.com/goschtalt/goschtalt v0.13.0/go.mod h1:mfE8q3rKJDM2HTFFbPP1m5m5Nn15A5Hk33JTZxPR2RM=
 github.com/k0kubun/pp/v3 v3.2.0 h1:h33hNTZ9nVFNP3u2Fsgz8JXiF5JINoZfFq4SvKJwNcs=
 github.com/kr/pretty v0.3.0 h1:WgNl7dwNpEZ6jJ9k1snq4pZsg7DOEN8hP9Xw0Tsjwk0=
 github.com/kr/text v0.2.0 h1:5Nx0Ya0ZqY2ygV366QzturHI13Jq95ApcVaJBhpS+AY=

@@ -34,7 +34,7 @@ const (
 	TrainCase          = "Two-Words"
 )
 
-var fmtToFn = map[string]func(string) string{
+var fmtToFunc = map[string]func(string) string{
 	"twowords":  allLower,
 	"TWOWORDS":  allUpper,
 	"twoWords":  casbab.Camel,
@@ -68,24 +68,24 @@ var fmtToFn = map[string]func(string) string{
 //   - Two-Words
 //   - two-Words
 //
-// This option provides a goschtalt.KeymapFn based option that will convert
+// This option provides a goschtalt.KeymapFunc based option that will convert
 // every input string, effectively ending the chain 100% of the time.
 // Generally, this option should be specified prior to any goschtalt.Keymap
 // options that handle customization.
 func ConfigStoredAs(format string) goschtalt.Option {
-	if toCase, found := fmtToFn[format]; found {
+	if toCase, found := fmtToFunc[format]; found {
 		return goschtalt.Options(
 			goschtalt.DefaultUnmarshalOptions(
-				goschtalt.KeymapFn(toCase),
+				goschtalt.KeymapFunc(toCase),
 			),
 			goschtalt.DefaultValueOptions(
-				goschtalt.KeymapFn(toCase),
+				goschtalt.KeymapFunc(toCase),
 			),
 		)
 	}
 
-	keys := make([]string, 0, len(fmtToFn))
-	for k := range fmtToFn {
+	keys := make([]string, 0, len(fmtToFunc))
+	for k := range fmtToFunc {
 		keys = append(keys, k)
 	}
 

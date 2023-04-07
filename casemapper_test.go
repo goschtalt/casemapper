@@ -109,7 +109,7 @@ func TestAllUpper(t *testing.T) {
 }
 
 func TestMapping(t *testing.T) {
-	for key, mapper := range fmtToFn {
+	for key, mapper := range fmtToFunc {
 		t.Run(key, func(t *testing.T) {
 			assert := assert.New(t)
 
