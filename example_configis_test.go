@@ -18,7 +18,7 @@ func ExampleConfigIs() {
 		goschtalt.DefaultUnmarshalOptions(goschtalt.KeymapReport(&c)),
 		goschtalt.DefaultValueOptions(goschtalt.KeymapReport(&c)),
 
-		casemapper.ConfigStoredAs("two_words",
+		casemapper.ConfigIs("two_words",
 			// Keys are the struct field names and values are the configuration
 			// names.
 			map[string]string{

@@ -123,7 +123,7 @@ func TestInvalidMapping(t *testing.T) {
 	assert := assert.New(t)
 
 	gs, err := goschtalt.New(goschtalt.AutoCompile(),
-		ConfigStoredAs("two_words",
+		ConfigIs("two_words",
 			map[string]string{
 				"Foo": "foo",
 			},
@@ -231,7 +231,7 @@ func TestUnknown(t *testing.T) {
 	assert := assert.New(t)
 	require := require.New(t)
 
-	gs, err := goschtalt.New(goschtalt.AutoCompile(), ConfigStoredAs("Invalid"))
+	gs, err := goschtalt.New(goschtalt.AutoCompile(), ConfigIs("Invalid"))
 	require.Nil(gs)
 	require.Error(err)
 	assert.True(strings.Contains(err.Error(), expected))
