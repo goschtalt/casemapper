@@ -11,6 +11,7 @@
 package casemapper
 
 import (
+	"errors"
 	"fmt"
 	"sort"
 	"strings"
@@ -34,6 +35,10 @@ const (
 	TrainCase          = "Two-Words"
 )
 
+var (
+	ErrDuplicate = errors.New("duplicate adjustment")
+)
+
 var fmtToFunc = map[string]func(string) string{
 	"twowords":  allLower,
 	"TWOWORDS":  allUpper,
@@ -49,7 +54,20 @@ var fmtToFunc = map[string]func(string) string{
 	"Two-Words": casbab.CamelKebab,
 }
 
-// ConfigStoredAs provides a strict field/key mapper that converts the config
+type casemapper struct {
+	toCase      func(string) string
+	adjustments map[string]string
+}
+
+func (c casemapper) Map(in string) string {
+	out, found := c.adjustments[in]
+	if !found {
+		out = c.toCase(in)
+	}
+	return out
+}
+
+// ConfigIs provides a strict field/key mapper that converts the config
 // values from the specified nomenclature into the go structure name.
 //
 // Since the names of the different formatting styles are not standardized, only
@@ -68,18 +86,33 @@ var fmtToFunc = map[string]func(string) string{
 //   - Two-Words
 //   - two-Words
 //
-// This option provides a goschtalt.KeymapFunc based option that will convert
-// every input string, effectively ending the chain 100% of the time.
-// Generally, this option should be specified prior to any goschtalt.Keymap
-// options that handle customization.
-func ConfigStoredAs(format string) goschtalt.Option {
+// This option provides a goschtalt.KeymapMapper based option that will convert
+// every input string, ending the chain 100% of the time.
+//
+// To make adjustments pass in a map (or many) with keys being the golang
+// structure field names and values being the configuration name.
+//
+// The map keys and values must be unique and the inverse mapping must also be
+// unique or an error is returned.
+func ConfigIs(format string, structToConfig ...map[string]string) goschtalt.Option {
+	sToC, cToS, err := merge(structToConfig)
+	if err != nil {
+		return goschtalt.WithError(err)
+	}
+
 	if toCase, found := fmtToFunc[format]; found {
 		return goschtalt.Options(
 			goschtalt.DefaultUnmarshalOptions(
-				goschtalt.KeymapFunc(toCase),
+				goschtalt.KeymapMapper(&casemapper{
+					toCase:      toCase,
+					adjustments: cToS,
+				}),
 			),
 			goschtalt.DefaultValueOptions(
-				goschtalt.KeymapFunc(toCase),
+				goschtalt.KeymapMapper(&casemapper{
+					toCase:      toCase,
+					adjustments: sToC,
+				}),
 			),
 		)
 	}
@@ -92,12 +125,29 @@ func ConfigStoredAs(format string) goschtalt.Option {
 	sort.Strings(keys)
 
 	return goschtalt.WithError(
-		fmt.Errorf("%w, '%s' unknown format by casemapper.ConfigStoredAs().  Known formats: %s",
+		fmt.Errorf("%w, '%s' unknown format by casemapper.ConfigIs().  Known formats: %s",
 			goschtalt.ErrInvalidInput,
 			format,
 			strings.Join(keys, ", "),
 		),
 	)
+}
+
+func merge(in []map[string]string) (map[string]string, map[string]string, error) {
+	sToC := make(map[string]string, len(in))
+	cToS := make(map[string]string, len(in))
+	for i := range in {
+		for k, v := range in[i] {
+			_, a := sToC[k]
+			_, b := cToS[v]
+			if a || b {
+				return nil, nil, fmt.Errorf("%w, '%s' is duplicated.", ErrDuplicate, k)
+			}
+			sToC[k] = v
+			cToS[v] = k
+		}
+	}
+	return sToC, cToS, nil
 }
 
 func allLower(s string) string {

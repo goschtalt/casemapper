@@ -8,18 +8,29 @@ import (
 
 	"github.com/goschtalt/casemapper"
 	"github.com/goschtalt/goschtalt"
+	"github.com/goschtalt/goschtalt/pkg/debug"
 )
 
-func ExampleConfigStoredAs() {
+func ExampleConfigIs() {
+	c := debug.Collect{}
 	gs, err := goschtalt.New(
 		goschtalt.AutoCompile(),
+		goschtalt.DefaultUnmarshalOptions(goschtalt.KeymapReport(&c)),
+		goschtalt.DefaultValueOptions(goschtalt.KeymapReport(&c)),
 
-		casemapper.ConfigStoredAs("two_words"),
+		casemapper.ConfigStoredAs("two_words",
+			// Keys are the struct field names and values are the configuration
+			// names.
+			map[string]string{
+				"Header": "http_header",
+				"Sally":  "frog",
+			},
+		),
 
 		// Normally you'll be including data from a file or something like that.
 		// Here we want to use the built in options to avoid including additional
 		// dependencies.
-		goschtalt.AddValue("incoming", "",
+		goschtalt.AddValue("incoming", goschtalt.Root,
 			&struct {
 				Name   string `goschtalt:"FirstName"` // Rename via tags...
 				Header string
@@ -29,15 +40,6 @@ func ExampleConfigStoredAs() {
 				Header: "Content-Type: text/plain",
 				Sally:  "Likes go",
 			},
-
-			// or rename via mapping, which is useful if you can't change
-			// the target structure, but want the configuration to be a
-			// specific key.
-			goschtalt.Keymap(
-				map[string]string{
-					"header": "HTTPHeader", // Convert Http back to HTTP
-				},
-			),
 		),
 	)
 	if err != nil {
@@ -50,22 +52,27 @@ func ExampleConfigStoredAs() {
 		Frog       string
 	}
 
-	cfg, err := goschtalt.Unmarshal[Config](gs, "",
-		// You can also remap when you unmarshal if that's simpler
-		goschtalt.Keymap(
-			map[string]string{
-				"frog": "sally",
-			},
-		),
-	)
+	cfg, err := goschtalt.Unmarshal[Config](gs, goschtalt.Root)
 	if err != nil {
 		panic(err)
 	}
 
+	fmt.Printf("Mappings:\n")
+	fmt.Print(c.String())
+
+	fmt.Printf("\nConfig:\n")
 	fmt.Printf("Config.HTTPHeader: '%s'\n", cfg.HTTPHeader)
 	fmt.Printf("Config.FirstName:  '%s'\n", cfg.FirstName)
 	fmt.Printf("Config.Frog:       '%s'\n", cfg.Frog)
 	// Output:
+	// Mappings:
+	// 'FirstName'  --> 'first_name'
+	// 'Frog'       --> 'frog'
+	// 'HTTPHeader' --> 'http_header'
+	// 'Header'     --> 'http_header'
+	// 'Sally'      --> 'frog'
+	//
+	// Config:
 	// Config.HTTPHeader: 'Content-Type: text/plain'
 	// Config.FirstName:  'Gopher'
 	// Config.Frog:       'Likes go'

@@ -9,35 +9,38 @@
 
 An optional set of [naming conventions](https://en.wikipedia.org/wiki/Naming_convention_(programming)) mapping options for goschtalt.
 
-Fairly often we want to use structures for configuration that we can't easily alter.
-Fortunately goschtalt provides an easy way to inject arbitrary mappers, however
-that code is fairly boiler plate and clunky to repeat.  Hence the value of this
+Fairly often we want to use structures for configuration that can't easily be
+altered.  Fortunately goschtalt provides an easy way to inject arbitrary mappers,
+however that code is fairly boiler plate and clunky to repeat.  Hence the value of this
 library.  With the [janos/casbab](https://github.com/janos/casbab) and a bit of
-glue code, it's now easy to automatically convert from config files that may be
-`snake_case` into go structures that follow the general conventions.
+glue code, it's now easy to automatically convert to/from config files that may
+be `snake_case` into go structures that follow the general conventions.
 
 To set configuration from go structs (AddValue()) or read configuration values
 from a configuration that is `snake_case` just use the option in place of
-`goschtalt.KeymapFn()`.
+`goschtalt.KeymapMapper()`.
 
 ```go
-	casemapper.ConfigStoredAs("two_words")
+	casemapper.ConfigIs("two_words")
 ```
 
-With more complex structures there will likely be exceptions needed.  For example,
-if the input data has the field `HTTP-Header` but the normal format expects that
-value as `Http-Header` no problem; there is an optional `map[string]string` parameter
-that maps the **configuration field** to the **structure field**.
+With more complex structures there will likely be adjustments will be needed.
+Adjustments are in the form of a map where keys are the golang struct field name
+and values are the configuration key name.
+
+For example:
 
 ```go
-	casemapper.ConfigStoredAs("Two_Words"),
-    goschtalt.Keymap(
+	casemapper.ConfigStoredAs("two_words",
 		map[string]string{
-			"Configuration-Field": "StructureField",
-			"HTTP-Header": "HTTPHeader",
+            "CfgField": "configuration_field",
+			"CNAMEs":   "cnames",
 		},
     )
 ```
+
+will use the normal snake case mapping except for `CfgField` and `CNAMEs` fields,
+which are mapped to `configuration_field` and `cnames` respectively.
 
 References
 ----------
