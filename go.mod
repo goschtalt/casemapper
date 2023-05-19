@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/goschtalt/goschtalt v0.19.1
-	github.com/stretchr/testify v1.8.2
+	github.com/stretchr/testify v1.8.3
 	resenje.org/casbab v0.1.1
 )
 
