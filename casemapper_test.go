@@ -140,7 +140,6 @@ func TestMapMerging(t *testing.T) {
 		description string
 		in          []map[string]string
 		sToC        map[string]string
-		cToS        map[string]string
 		expectErr   error
 	}{
 		{
@@ -152,9 +151,6 @@ func TestMapMerging(t *testing.T) {
 			},
 			sToC: map[string]string{
 				"a": "b",
-			},
-			cToS: map[string]string{
-				"b": "a",
 			},
 		}, {
 			description: "multiple in the array",
@@ -170,12 +166,8 @@ func TestMapMerging(t *testing.T) {
 				"A": "a",
 				"B": "b",
 			},
-			cToS: map[string]string{
-				"a": "A",
-				"b": "B",
-			},
 		}, {
-			description: "invalid, duplicated config name",
+			description: "duplicated config name",
 			in: []map[string]string{
 				map[string]string{
 					"A": "a",
@@ -187,7 +179,11 @@ func TestMapMerging(t *testing.T) {
 					"C": "b",
 				},
 			},
-			expectErr: ErrDuplicate,
+			sToC: map[string]string{
+				"A": "a",
+				"B": "b",
+				"C": "b",
+			},
 		}, {
 			description: "invalid, duplicated field name",
 			in: []map[string]string{
@@ -209,17 +205,15 @@ func TestMapMerging(t *testing.T) {
 		t.Run(tc.description, func(t *testing.T) {
 			assert := assert.New(t)
 
-			a, b, e := merge(tc.in)
+			a, e := merge(tc.in)
 
 			if tc.expectErr == nil {
 				assert.Equal(a, tc.sToC)
-				assert.Equal(b, tc.cToS)
 				assert.NoError(e)
 				return
 			}
 
 			assert.Nil(a)
-			assert.Nil(b)
 			assert.ErrorIs(e, tc.expectErr)
 		})
 	}

@@ -22,8 +22,7 @@ func ExampleConfigIs() {
 			// Keys are the struct field names and values are the configuration
 			// names.
 			map[string]string{
-				"Header": "http_header",
-				"Sally":  "frog",
+				"CNAMEs": "cnames",
 			},
 		),
 
@@ -32,11 +31,11 @@ func ExampleConfigIs() {
 		// dependencies.
 		goschtalt.AddValue("incoming", goschtalt.Root,
 			&struct {
-				Name   string `goschtalt:"FirstName"` // Rename via tags...
+				CNAMEs string
 				Header string
 				Sally  string
 			}{
-				Name:   "Gopher",
+				CNAMEs: "C Names",
 				Header: "Content-Type: text/plain",
 				Sally:  "Likes go",
 			},
@@ -47,9 +46,9 @@ func ExampleConfigIs() {
 	}
 
 	type Config struct {
-		HTTPHeader string
-		FirstName  string
-		Frog       string
+		CNAMEs string
+		Header string
+		Sally  string
 	}
 
 	cfg, err := goschtalt.Unmarshal[Config](gs, goschtalt.Root)
@@ -61,19 +60,17 @@ func ExampleConfigIs() {
 	fmt.Print(c.String())
 
 	fmt.Printf("\nConfig:\n")
-	fmt.Printf("Config.HTTPHeader: '%s'\n", cfg.HTTPHeader)
-	fmt.Printf("Config.FirstName:  '%s'\n", cfg.FirstName)
-	fmt.Printf("Config.Frog:       '%s'\n", cfg.Frog)
+	fmt.Printf("Config.CNAMEs: '%s'\n", cfg.CNAMEs)
+	fmt.Printf("Config.Header: '%s'\n", cfg.Header)
+	fmt.Printf("Config.Sally:  '%s'\n", cfg.Sally)
 	// Output:
 	// Mappings:
-	// 'FirstName'  --> 'first_name'
-	// 'Frog'       --> 'frog'
-	// 'HTTPHeader' --> 'http_header'
-	// 'Header'     --> 'http_header'
-	// 'Sally'      --> 'frog'
+	// 'CNAMEs' --> 'cnames'
+	// 'Header' --> 'header'
+	// 'Sally'  --> 'sally'
 	//
 	// Config:
-	// Config.HTTPHeader: 'Content-Type: text/plain'
-	// Config.FirstName:  'Gopher'
-	// Config.Frog:       'Likes go'
+	// Config.CNAMEs: 'C Names'
+	// Config.Header: 'Content-Type: text/plain'
+	// Config.Sally:  'Likes go'
 }

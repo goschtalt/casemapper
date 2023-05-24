@@ -91,11 +91,8 @@ func (c casemapper) Map(in string) string {
 //
 // To make adjustments pass in a map (or many) with keys being the golang
 // structure field names and values being the configuration name.
-//
-// The map keys and values must be unique and the inverse mapping must also be
-// unique or an error is returned.
 func ConfigIs(format string, structToConfig ...map[string]string) goschtalt.Option {
-	sToC, cToS, err := merge(structToConfig)
+	sToC, err := merge(structToConfig)
 	if err != nil {
 		return goschtalt.WithError(err)
 	}
@@ -105,7 +102,7 @@ func ConfigIs(format string, structToConfig ...map[string]string) goschtalt.Opti
 			goschtalt.DefaultUnmarshalOptions(
 				goschtalt.KeymapMapper(&casemapper{
 					toCase:      toCase,
-					adjustments: cToS,
+					adjustments: sToC,
 				}),
 			),
 			goschtalt.DefaultValueOptions(
@@ -133,21 +130,17 @@ func ConfigIs(format string, structToConfig ...map[string]string) goschtalt.Opti
 	)
 }
 
-func merge(in []map[string]string) (map[string]string, map[string]string, error) {
+func merge(in []map[string]string) (map[string]string, error) {
 	sToC := make(map[string]string, len(in))
-	cToS := make(map[string]string, len(in))
 	for i := range in {
 		for k, v := range in[i] {
-			_, a := sToC[k]
-			_, b := cToS[v]
-			if a || b {
-				return nil, nil, fmt.Errorf("%w, '%s' is duplicated.", ErrDuplicate, k)
+			if _, a := sToC[k]; a {
+				return nil, fmt.Errorf("%w, '%s' is duplicated.", ErrDuplicate, k)
 			}
 			sToC[k] = v
-			cToS[v] = k
 		}
 	}
-	return sToC, cToS, nil
+	return sToC, nil
 }
 
 func allLower(s string) string {

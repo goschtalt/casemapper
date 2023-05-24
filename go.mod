@@ -3,7 +3,7 @@ module github.com/goschtalt/casemapper
 go 1.18
 
 require (
-	github.com/goschtalt/goschtalt v0.20.0
+	github.com/goschtalt/goschtalt v0.20.1
 	github.com/stretchr/testify v1.8.3
 	resenje.org/casbab v0.1.1
 )
