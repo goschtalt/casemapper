@@ -1,5 +1,7 @@
 # casemapper
 
+Functionality was moved into goschtalt v0.21.0 since this is nearly always needed.
+
 [![Build Status](https://github.com/goschtalt/casemapper/actions/workflows/ci.yml/badge.svg)](https://github.com/goschtalt/casemapper/actions/workflows/ci.yml)
 [![codecov.io](http://codecov.io/github/goschtalt/casemapper/coverage.svg?branch=main)](http://codecov.io/github/goschtalt/casemapper?branch=main)
 [![Go Report Card](https://goreportcard.com/badge/github.com/goschtalt/casemapper)](https://goreportcard.com/report/github.com/goschtalt/casemapper)
